@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd" caption="msg://editorCaption" focusComponent="form"
+        messagesPack="com.haulmont.taskman.web.task">
+    <data>
+        <instance id="taskDc" class="com.haulmont.taskman.entity.Task" view="_local">
+            <loader/>
+        </instance>
+    </data>
+    <dialogMode height="600" width="800"/>
+    <layout spacing="true">
+        <form id="form" dataContainer="taskDc">
+            <textField id="numberField" property="number"/>
+        </form>
+    </layout>
+</window>
