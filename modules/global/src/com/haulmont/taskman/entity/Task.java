@@ -2,10 +2,13 @@ package com.haulmont.taskman.entity;
 
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.StandardEntity;
+import com.haulmont.cuba.core.entity.annotation.OnDelete;
+import com.haulmont.cuba.core.global.DeletePolicy;
 import com.haulmont.cuba.security.entity.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @NamePattern("[#%s] %s|number,subject")
 @Table(name = "TASKMAN_TASK")
@@ -32,6 +35,18 @@ public class Task extends StandardEntity {
 
     @Column(name = "CONTENT")
     protected String content;
+
+    @OnDelete(DeletePolicy.CASCADE)
+    @OneToMany(mappedBy = "task")
+    protected List<TaskMessage> messages;
+
+    public List<TaskMessage> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<TaskMessage> messages) {
+        this.messages = messages;
+    }
 
     public String getContent() {
         return content;

@@ -30,6 +30,7 @@
                 <action id="create" type="create"/>
                 <action id="edit" type="edit"/>
                 <action id="remove" type="remove"/>
+                <action id="excel" type="excel"/>
             </actions>
             <columns>
                 <column id="number"/>
@@ -44,6 +45,10 @@
                 <button id="createBtn" action="tasksTable.create"/>
                 <button id="editBtn" action="tasksTable.edit"/>
                 <button id="removeBtn" action="tasksTable.remove"/>
+                <button id="assign" caption="msg://assign"/>
+                <button id="inProgress" caption="msg://inProgress"/>
+                <button id="close" caption="msg://close"/>
+                <button id="excelBtn" action="tasksTable.excel"/>
             </buttonsPanel>
         </groupTable>
         <hbox id="lookupActions" spacing="true" visible="false">
