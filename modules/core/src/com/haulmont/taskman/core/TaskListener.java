@@ -21,7 +21,6 @@ public class TaskListener implements BeforeInsertEntityListener<Task> {
 
     @Override
     public void onBeforeInsert(Task entity, EntityManager entityManager) {
-        log.debug(" =======> onBeforeInsert");
         if (entity.getNumber() == null || entity.getNumber() == 0L) {
             entity.setNumber(uniqueNumbersAPI.getNextNumber(Task.class.getSimpleName()));
             entityManager.persist(entity);
