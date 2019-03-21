@@ -33,11 +33,12 @@
                 <action id="excel" type="excel"/>
             </actions>
             <columns>
+                <column id="createTs"/>
                 <column id="number"/>
-                <column id="reporterEmail"/>
                 <column id="state"/>
+                <column id="reporterEmail"/>
                 <column id="subject"/>
-                <column id="content"/>
+                <column id="assignee"/>
             </columns>
             <rowsCount/>
             <buttonsPanel id="buttonsPanel"

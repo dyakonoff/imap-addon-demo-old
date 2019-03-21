@@ -4,7 +4,10 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Table;
+import com.haulmont.cuba.gui.model.DataContext;
+import com.haulmont.cuba.gui.model.InstanceContainer;
 import com.haulmont.cuba.gui.screen.*;
+import com.haulmont.cuba.gui.util.OperationResult;
 import com.haulmont.taskman.entity.Task;
 import com.haulmont.taskman.entity.TaskMessage;
 
@@ -21,6 +24,8 @@ public class TaskEdit extends StandardEditor<Task> {
     private ScreenBuilders screenBuilders;
     @Inject
     private Metadata metadata;
+    @Inject
+    private InstanceContainer<Task> taskDc;
 
     @Subscribe("messagesTable.edit")
     private void onMessagesTableEdit(Action.ActionPerformedEvent event) {
@@ -34,6 +39,16 @@ public class TaskEdit extends StandardEditor<Task> {
                         getEditedEntityLoader().load()
                 );
     }
-    
-    
+
+    @Subscribe(target = Target.DATA_CONTEXT)
+    private void onPreCommit(DataContext.PreCommitEvent event) {
+        if (taskDc.getItem().getNumber() == null) {
+            // set it to 0, to get it finally assigned in the LIstener
+            taskDc.getItem().setNumber(0L);
+        }
+    }
+
+
+
+
 }
