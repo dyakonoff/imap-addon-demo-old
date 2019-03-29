@@ -1,0 +1,7 @@
+Reply for task # ${task.number}:
+
+${message.content}
+
+=======================================
+Sincerely yours,
+CUBA IMAP addon demo application.

@@ -1,6 +1,6 @@
 -- begin TASKMAN_TASK
 alter table TASKMAN_TASK add constraint FK_TASKMAN_TASK_ON_ASSIGNEE foreign key (ASSIGNEE_ID) references SEC_USER(ID)^
-create unique index IDX_TASKMAN_TASK_UNIQ_NUMBER_ on TASKMAN_TASK (NUMBER_) ^
+create unique index IDX_TASKMAN_TASK_UK_NUMBER_ on TASKMAN_TASK (NUMBER_) where DELETE_TS is null ^
 create index IDX_TASKMAN_TASK_ON_ASSIGNEE on TASKMAN_TASK (ASSIGNEE_ID)^
 -- end TASKMAN_TASK
 -- begin TASKMAN_TASK_MESSAGE
