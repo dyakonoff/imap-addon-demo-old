@@ -1,0 +1,1 @@
+alter table TASKMAN_TASK_MESSAGE add column if not exists ORIGINAL_IMAP_MESSAGE_ID varchar(255) ;

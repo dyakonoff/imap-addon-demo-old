@@ -6,7 +6,7 @@ Do not change the subject of this message when replying to it.
 
 Original message:
 ===============================================================================
-${message.content}
+${message_content}
 
 =======================================
 Sincerely yours,

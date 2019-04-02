@@ -1,16 +1,14 @@
 
 package com.haulmont.taskman.core;
 
-import com.google.common.collect.ImmutableMap;
 import com.haulmont.addon.imap.api.ImapAPI;
 import com.haulmont.addon.imap.dto.ImapMessageDto;
 import com.haulmont.addon.imap.entity.ImapMessage;
 import com.haulmont.addon.imap.events.NewEmailImapEvent;
-import com.haulmont.cuba.core.app.EmailerAPI;
 import com.haulmont.cuba.core.app.UniqueNumbersAPI;
 import com.haulmont.cuba.core.global.DataManager;
-import com.haulmont.cuba.core.global.EmailInfo;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.taskman.entity.MessageDirection;
 import com.haulmont.taskman.entity.Task;
 import com.haulmont.taskman.entity.TaskMessage;
@@ -22,8 +20,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.io.Serializable;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,23 +44,23 @@ public class ImapMessageHandler {
     private UniqueNumbersAPI uniqueNumbersAPI;
 
     @Inject
-    private EmailerAPI emailerAPI;
+    private ResponseEmailAsyncSenderBean emailSender;
 
     @EventListener
     @Transactional
     public void handleMessage(NewEmailImapEvent imapEvent) {
-        log.debug("=====> ImapMessageHandler.handleMessage");
         ImapMessage imapMessage = imapEvent.getMessage();
         ImapMessageDto imapMessageDto = imapAPI.fetchMessage(imapMessage);
         String subject = imapMessageDto.getSubject();
 
-        TaskMessage message = metadata.create(TaskMessage.class);
-        message.setContent(imapMessageDto.getBody());
-        message.setSubject(imapMessageDto.getSubject());
-        message.setReporter(imapMessageDto.getFrom());
-        message.setImapMessage(imapMessage);
-        message.setDirection(MessageDirection.INBOX);
+        if (isTaskMessageExistsForImapMessage(imapMessage)) {
+            log.info("Skipping the message with messageId = " + imapMessage.getMessageId());
+            return;
+        }
 
+        TaskMessage message = buildNewTaskMessage(imapMessage, imapMessageDto);
+
+        // this is a new message that hasn't been processed before
         boolean isNewTask = false;
 
         Matcher matcher = TASK_NUMBER_PATTERN.matcher(subject);
@@ -92,31 +88,21 @@ public class ImapMessageHandler {
 
         dataManager.commit(task, message);
 
-        sendResponse(imapMessageDto, message, isNewTask, task);
+        if (isNewTask) {
+            emailSender.sendNewTaskResponse(task, message, imapMessageDto);
+        } else {
+            emailSender.sendUpdateTaskResponse(task, message, imapMessageDto);
+        }
     }
 
-    private void sendResponse(ImapMessageDto imapMessageDto, TaskMessage message, boolean isNewTask, Task task) {
-        String templateName;
-        if (isNewTask) {
-            templateName = "com/haulmont/taskman/templates/new-task.txt";
-        } else {
-            templateName = "com/haulmont/taskman/templates/exist-task.txt";
-        }
-
-        Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message", message);
-        EmailInfo emailInfo = new EmailInfo(
-                task.getReporterEmail(),
-                task.getSubject(),
-                null,
-                templateName,
-                parameters);
-
-        String cc = imapMessageDto.getCc();
-        if (!"[]".equals(cc)) {
-            emailInfo.setCc(cc);
-        }
-
-        emailerAPI.sendEmailAsync(emailInfo);
+    private TaskMessage buildNewTaskMessage(ImapMessage imapMessage, ImapMessageDto imapMessageDto) {
+        TaskMessage message = metadata.create(TaskMessage.class);
+        message.setContent(imapMessageDto.getBody());
+        message.setSubject(imapMessageDto.getSubject());
+        message.setReporter(imapMessageDto.getFrom());
+        message.setImapMessage(imapMessage);
+        message.setDirection(MessageDirection.INBOX);
+        return message;
     }
 
     private Task findTaskByNumber(Integer taskNumber) {
@@ -126,5 +112,16 @@ public class ImapMessageHandler {
                 .parameter("number", taskNumber)
                 .optional()
                 .orElse(null);
+    }
+
+    private boolean isTaskMessageExistsForImapMessage(ImapMessage imapMessage) {
+        TaskMessage taskMessage = dataManager.load(TaskMessage.class)
+                .view(View.MINIMAL)
+                .query("select tm from taskman_TaskMessage tm where tm.originalImapMessageId = :imapMessaeId")
+                .parameter("imapMessaeId", imapMessage.getMessageId())
+                .optional()
+                .orElse(null);
+
+        return taskMessage != null;
     }
 }

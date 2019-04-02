@@ -10,4 +10,10 @@
             <property name="content"/>
         </property>
     </view>
+    <view entity="taskman_Task" name="task-browse-view" extends="_minimal">
+        <property name="reporterEmail"/>
+        <property name="assignee" view="_minimal"/>
+        <property name="state"/>
+        <property name="createTs"/>
+    </view>
 </views>

@@ -1,6 +1,7 @@
 package com.haulmont.taskman.entity;
 
 import com.haulmont.addon.imap.entity.ImapMessage;
+import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.core.entity.annotation.OnDeleteInverse;
@@ -9,13 +10,17 @@ import com.haulmont.cuba.core.global.DeletePolicy;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-@Table(name = "TASKMAN_TASK_MESSAGE")
+@NamePattern("%s, %s|reporter,subject")
+@Table(name = "TASKMAN_TASK_MESSAGE", indexes = {
+        @Index(name = "INDX_TASKMAN_TASK_MESSAGE_ON_ORIGINAL_IMAP_MESSAGE_ID", columnList = "ORIGINAL_IMAP_MESSAGE_ID")
+})
 @Entity(name = "taskman_TaskMessage")
 @Listeners({"taskman_TaskMessageListener"})
 public class TaskMessage extends StandardEntity {
@@ -42,6 +47,17 @@ public class TaskMessage extends StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IMAP_MESSAGE_ID")
     protected ImapMessage imapMessage;
+
+    @Column(name = "ORIGINAL_IMAP_MESSAGE_ID")
+    protected String originalImapMessageId;
+
+    public String getOriginalImapMessageId() {
+        return originalImapMessageId;
+    }
+
+    public void setOriginalImapMessageId(String originalImapMessageId) {
+        this.originalImapMessageId = originalImapMessageId;
+    }
 
     public ImapMessage getImapMessage() {
         return imapMessage;

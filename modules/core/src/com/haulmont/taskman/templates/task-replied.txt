@@ -1,6 +1,6 @@
 Reply for task # ${task.number}:
 
-${message.content}
+${message_content}
 
 =======================================
 Sincerely yours,

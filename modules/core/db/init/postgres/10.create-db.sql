@@ -36,6 +36,7 @@ create table TASKMAN_TASK_MESSAGE (
     CONTENT text,
     TASK_ID uuid not null,
     IMAP_MESSAGE_ID uuid,
+    ORIGINAL_IMAP_MESSAGE_ID varchar(255),
     --
     primary key (ID)
 )^
