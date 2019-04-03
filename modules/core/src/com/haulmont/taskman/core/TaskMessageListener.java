@@ -20,7 +20,7 @@ public class TaskMessageListener implements BeforeInsertEntityListener<TaskMessa
     @Override
     public void onBeforeInsert(TaskMessage message, EntityManager entityManager) {
         if (MessageDirection.OUTBOX == message.getDirection()) {
-            Task task = entityManager.find(Task.class, message.getTask().getId(), "task-message-view");
+            Task task = entityManager.find(Task.class, message.getTask().getId(), "task-state-view");
             task.setState(TaskState.REPLIED);
             entityManager.persist(task);
 

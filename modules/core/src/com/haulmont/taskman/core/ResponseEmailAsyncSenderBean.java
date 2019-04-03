@@ -47,10 +47,9 @@ public class ResponseEmailAsyncSenderBean {
     protected void sendResponseEmail(Task task, TaskMessage taskMessage, @Nullable ImapMessageDto imapMessageDto, String templateName) {
         String messageContent = htmlToTextConverterService.convert(taskMessage.getContent());
         Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", messageContent);
-        String emailSubject = String.format("#%d %s", task.getNumber(), task.getSubject());
         EmailInfo emailInfo = new EmailInfo(
                 task.getReporterEmail(),
-                emailSubject,
+                task.getSubject(),
                 null,
                 templateName,
                 parameters);
@@ -64,7 +63,7 @@ public class ResponseEmailAsyncSenderBean {
             }
         }
 
-        log.info("Sending an email over SMTP with subject: " + emailSubject);
+        log.info("Sending an email over SMTP with subject: " + task.getSubject());
         emailerAPI.sendEmailAsync(emailInfo);
     }
 }

@@ -11,8 +11,8 @@
         <form id="form" dataContainer="taskMessageDc" width="100%">
             <column width="100%">
                 <textField id="reporterField" property="reporter" editable="false"/>
-                <lookupField id="directionField" property="direction"/>
-                <textField id="subjectField" property="subject"/>
+                <lookupField id="directionField" property="direction" editable="false"/>
+                <textField id="subjectField" property="subject" editable="false"/>
                 <textArea id="contentField" property="content"/>
             </column>
         </form>

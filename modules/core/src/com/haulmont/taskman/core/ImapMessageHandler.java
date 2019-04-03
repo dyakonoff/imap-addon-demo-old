@@ -75,12 +75,13 @@ public class ImapMessageHandler {
         }
 
         if (task == null) {
+            Long taskNumber = uniqueNumbersAPI.getNextNumber(Task.class.getSimpleName());
             task = metadata.create(Task.class);
             task.setState(TaskState.OPEN);
             task.setContent(imapMessageDto.getBody());
-            task.setSubject(imapMessageDto.getSubject());
+            task.setSubject(String.format("#%d %s", taskNumber, imapMessageDto.getSubject()));
             task.setReporterEmail(imapMessageDto.getFrom());
-            task.setNumber(uniqueNumbersAPI.getNextNumber(Task.class.getSimpleName()));
+            task.setNumber(taskNumber);
             isNewTask = true;
         }
 

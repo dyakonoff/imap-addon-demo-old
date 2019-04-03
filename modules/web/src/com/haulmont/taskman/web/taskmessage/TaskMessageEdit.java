@@ -8,4 +8,5 @@ import com.haulmont.taskman.entity.TaskMessage;
 @EditedEntityContainer("taskMessageDc")
 @LoadDataBeforeShow
 public class TaskMessageEdit extends StandardEditor<TaskMessage> {
+
 }

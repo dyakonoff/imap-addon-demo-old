@@ -18,4 +18,7 @@
         <property name="state"/>
         <property name="createTs"/>
     </view>
+    <view entity="taskman_Task" name="task-state-view" extends="_minimal">
+        <property name="state"/>
+    </view>
 </views>
