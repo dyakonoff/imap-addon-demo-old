@@ -103,6 +103,7 @@ public class ImapMessageHandler {
         message.setReporter(imapMessageDto.getFrom());
         message.setImapMessage(imapMessage);
         message.setDirection(MessageDirection.INBOX);
+        message.setOriginalImapMessageId(imapMessage.getMessageId());
         return message;
     }
 
