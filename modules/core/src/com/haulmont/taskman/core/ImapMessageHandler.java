@@ -54,6 +54,7 @@ public class ImapMessageHandler {
     @Transactional
     public void handleMessage(NewEmailImapEvent imapEvent) {
         ImapMessage imapMessage = imapEvent.getMessage();
+        log.info(String.format("Process email subject ='%s', id=%d", imapMessage.getCaption(), imapEvent.getMessageId()));
 
         if (isTaskMessageExistsForImapMessage(imapMessage)) {
             log.info("Skipping the message with messageId = " + imapMessage.getMessageId());
