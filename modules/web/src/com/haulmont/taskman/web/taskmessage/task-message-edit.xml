@@ -13,7 +13,7 @@
                 <textField id="reporterField" property="reporter" editable="false"/>
                 <lookupField id="directionField" property="direction" editable="false"/>
                 <textField id="subjectField" property="subject" editable="false"/>
-                <textArea id="contentField" property="content"/>
+                <textArea id="contentField" property="content" trim="false"/>
             </column>
         </form>
         <label value="" id="spacer1"/>

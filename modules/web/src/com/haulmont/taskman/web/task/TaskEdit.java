@@ -1,7 +1,5 @@
 package com.haulmont.taskman.web.task;
 
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.gui.Notifications;
 import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.HasValue;
@@ -34,13 +32,9 @@ public class TaskEdit extends StandardEditor<Task> {
     @Inject
     private ScreenBuilders screenBuilders;
     @Inject
-    private Metadata metadata;
-    @Inject
     private InstanceContainer<Task> taskDc;
     @Inject
     private TextField<User> assignedTo;
-    @Inject
-    private Notifications notifications;
 
     @Subscribe("messagesTable.create")
     private void onMessagesTableEdit(Action.ActionPerformedEvent event) {
@@ -58,10 +52,6 @@ public class TaskEdit extends StandardEditor<Task> {
                         getEditedEntityLoader().load()
                 );
     }
-
-
-
-
 
     @Subscribe(target = Target.DATA_CONTEXT)
     private void onPreCommit(DataContext.PreCommitEvent event) {
