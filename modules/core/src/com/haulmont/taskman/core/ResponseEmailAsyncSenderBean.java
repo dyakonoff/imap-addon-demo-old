@@ -25,9 +25,6 @@ public class ResponseEmailAsyncSenderBean {
     @Inject
     private EmailerAPI emailerAPI;
 
-    @Inject
-    private HtmlToTextConverterService htmlToTextConverterService;
-
     protected final static String NEW_TASK_TEMPLATE = "com/haulmont/taskman/templates/new-task.txt";
     protected final static String UPDATE_TASK_TEMPLATE = "com/haulmont/taskman/templates/exist-task.txt";
     protected final static String REPLY_TASK_TEMPLATE = "com/haulmont/taskman/templates/task-replied.txt";
@@ -45,8 +42,7 @@ public class ResponseEmailAsyncSenderBean {
     }
 
     protected void sendResponseEmail(Task task, TaskMessage taskMessage, @Nullable ImapMessageDto imapMessageDto, String templateName) {
-        String messageContent = htmlToTextConverterService.convert(taskMessage.getContent());
-        Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", messageContent);
+        Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", taskMessage.getContent());
         EmailInfo emailInfo = new EmailInfo(
                 task.getReporterEmail(),
                 task.getSubject(),

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.regex.Matcher;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public class ImapMessageHandler {
     public static final String NAME = "taskman_ImapMessageHandler";
 
-    protected final static Pattern TASK_NUMBER_PATTERN = Pattern.compile("^#(\\d+)\\s");
+    protected final static Pattern TASK_NUMBER_PATTERN = Pattern.compile("^(?:Re:\\s*)*#(\\d+)\\s");
 
     private static final Logger log = LoggerFactory.getLogger(ImapMessageHandler.class);
 
@@ -46,42 +47,29 @@ public class ImapMessageHandler {
     @Inject
     private ResponseEmailAsyncSenderBean emailSender;
 
+    @Inject
+    private HtmlToTextConverterService htmlToText;
+
     @EventListener
     @Transactional
     public void handleMessage(NewEmailImapEvent imapEvent) {
         ImapMessage imapMessage = imapEvent.getMessage();
-        ImapMessageDto imapMessageDto = imapAPI.fetchMessage(imapMessage);
-        String subject = imapMessageDto.getSubject();
 
         if (isTaskMessageExistsForImapMessage(imapMessage)) {
             log.info("Skipping the message with messageId = " + imapMessage.getMessageId());
             return;
         }
 
+        ImapMessageDto imapMessageDto = imapAPI.fetchMessage(imapMessage);
+        String subject = imapMessageDto.getSubject();
+
         TaskMessage message = buildNewTaskMessage(imapMessage, imapMessageDto);
 
-        // this is a new message that hasn't been processed before
         boolean isNewTask = false;
 
-        Matcher matcher = TASK_NUMBER_PATTERN.matcher(subject);
-        Task task = null;
-
-        if (matcher.find()) {
-            String taskNumber = matcher.group(1);
-            task = findTaskByNumber(Integer.valueOf(taskNumber));
-            if (task != null && TaskState.REPLIED == task.getState()) {
-                task.setState(TaskState.ASSIGNED);
-            }
-        }
-
+        Task task = retrieveTaskByEmailSubject(subject);
         if (task == null) {
-            Long taskNumber = uniqueNumbersAPI.getNextNumber(Task.class.getSimpleName());
-            task = metadata.create(Task.class);
-            task.setState(TaskState.OPEN);
-            task.setContent(imapMessageDto.getBody());
-            task.setSubject(String.format("#%d %s", taskNumber, imapMessageDto.getSubject()));
-            task.setReporterEmail(imapMessageDto.getFrom());
-            task.setNumber(taskNumber);
+            task = buildNewTask(message);
             isNewTask = true;
         }
 
@@ -96,14 +84,46 @@ public class ImapMessageHandler {
         }
     }
 
+    @Nullable
+    private Task retrieveTaskByEmailSubject(String subject) {
+        Matcher matcher = TASK_NUMBER_PATTERN.matcher(subject);
+        Task task = null;
+
+        if (matcher.find()) {
+            String taskNumber = matcher.group(1);
+            task = findTaskByNumber(Integer.valueOf(taskNumber));
+            if (task != null && TaskState.REPLIED == task.getState()) {
+                task.setState(TaskState.ASSIGNED);
+            }
+        }
+
+        return task;
+    }
+
+    private Task buildNewTask(TaskMessage message) {
+        Long taskNumber = uniqueNumbersAPI.getNextNumber(Task.class.getSimpleName());
+
+        Task task = metadata.create(Task.class);
+        task.setState(TaskState.OPEN);
+        task.setContent(message.getContent());
+        task.setSubject(String.format("#%d %s", taskNumber, message.getSubject()));
+        task.setReporterEmail(message.getReporter());
+        task.setNumber(taskNumber);
+
+        return task;
+    }
+
     private TaskMessage buildNewTaskMessage(ImapMessage imapMessage, ImapMessageDto imapMessageDto) {
+        String messageText = htmlToText.convert(imapMessageDto.getBody());
+
         TaskMessage message = metadata.create(TaskMessage.class);
-        message.setContent(imapMessageDto.getBody());
+        message.setContent(messageText);
         message.setSubject(imapMessageDto.getSubject());
         message.setReporter(imapMessageDto.getFrom());
         message.setImapMessage(imapMessage);
         message.setDirection(MessageDirection.INBOX);
         message.setOriginalImapMessageId(imapMessage.getMessageId());
+
         return message;
     }
 

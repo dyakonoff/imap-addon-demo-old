@@ -57,16 +57,6 @@ public class TaskEdit extends StandardEditor<Task> {
                 .addAfterCloseListener(e ->
                         getEditedEntityLoader().load()
                 );
-
-//        screenBuilders.editor(messagesTable)
-//                .newEntity()
-//                .withScreenId(metadata.getClass(TaskMessage.class).getName() + ".edit")
-//                .withLaunchMode(OpenMode.DIALOG)
-//                .build()
-//                .show()
-//                .addAfterCloseListener(e ->
-//                        getEditedEntityLoader().load()
-//                );
     }
 
 
