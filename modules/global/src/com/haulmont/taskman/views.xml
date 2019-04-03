@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
     <view entity="taskman_Task" name="task-view" extends="_local">
-        <property name="assignee" view="_minimal"/>
+        <property name="assignee" view="_minimal">
+            <property name="firstName"/>
+            <property name="lastName"/>
+            <property name="middleName"/>
+        </property>
         <property name="messages" view="_minimal">
-            <property name="createTs"/>
             <property name="direction"/>
-            <property name="reporter"/>
-            <property name="subject"/>
             <property name="content"/>
+            <property name="createTs"/>
         </property>
     </view>
     <view entity="taskman_Task" name="task-browse-view" extends="_minimal">

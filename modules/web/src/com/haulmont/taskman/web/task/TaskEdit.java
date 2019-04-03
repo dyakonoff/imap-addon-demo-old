@@ -3,13 +3,17 @@ package com.haulmont.taskman.web.task;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.Action;
+import com.haulmont.cuba.gui.components.HasValue;
 import com.haulmont.cuba.gui.components.Table;
+import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.model.DataContext;
 import com.haulmont.cuba.gui.model.InstanceContainer;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.cuba.gui.util.OperationResult;
+import com.haulmont.cuba.security.entity.User;
 import com.haulmont.taskman.entity.Task;
 import com.haulmont.taskman.entity.TaskMessage;
+import com.haulmont.taskman.entity.TaskState;
 
 import javax.inject.Inject;
 
@@ -26,6 +30,8 @@ public class TaskEdit extends StandardEditor<Task> {
     private Metadata metadata;
     @Inject
     private InstanceContainer<Task> taskDc;
+    @Inject
+    private TextField<User> assignedTo;
 
     @Subscribe("messagesTable.edit")
     private void onMessagesTableEdit(Action.ActionPerformedEvent event) {
@@ -48,7 +54,8 @@ public class TaskEdit extends StandardEditor<Task> {
         }
     }
 
-
-
-
+    @Subscribe("stateField")
+    private void onStateFieldValueChange(HasValue.ValueChangeEvent<TaskState> event) {
+        assignedTo.setVisible(event.getValue() == TaskState.ASSIGNED);
+    }
 }

@@ -2,7 +2,7 @@
 <window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd" caption="msg://editorCaption" focusComponent="form"
         messagesPack="com.haulmont.taskman.web.task">
     <data>
-        <instance id="taskDc" class="com.haulmont.taskman.entity.Task" view="_local">
+        <instance id="taskDc" class="com.haulmont.taskman.entity.Task" view="task-view">
             <loader/>
             <collection id="messagesDc" property="messages"/>
         </instance>
@@ -16,6 +16,7 @@
                         <textField id="numberField" property="number" editable="false"/>
                         <textField id="reporterEmailField" property="reporterEmail"/>
                         <lookupField id="stateField" property="state"/>
+                        <textField id="assignedTo" property="assignee" visible="false" editable="false"/>
                         <textField id="subjectField" property="subject"/>
                     </column>
                 </form>
