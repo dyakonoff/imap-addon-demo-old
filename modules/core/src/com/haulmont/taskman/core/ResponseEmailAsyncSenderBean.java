@@ -12,12 +12,8 @@ import org.springframework.stereotype.Component;
 
 
 import javax.annotation.Nullable;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.parser.ParserDelegator;
-import java.io.IOException;
-import java.io.Reader;
+import javax.inject.Inject;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.Map;
 
 @Component(ResponseEmailAsyncSenderBean.NAME)
@@ -26,34 +22,15 @@ public class ResponseEmailAsyncSenderBean {
 
     private static final Logger log = LoggerFactory.getLogger(ResponseEmailAsyncSenderBean.class);
 
+    @Inject
     private EmailerAPI emailerAPI;
+
+    @Inject
+    private HtmlToTextConverterService htmlToTextConverterService;
 
     protected final static String NEW_TASK_TEMPLATE = "com/haulmont/taskman/templates/new-task.txt";
     protected final static String UPDATE_TASK_TEMPLATE = "com/haulmont/taskman/templates/exist-task.txt";
     protected final static String REPLY_TASK_TEMPLATE = "com/haulmont/taskman/templates/task-replied.txt";
-
-    protected class Html2Text extends HTMLEditorKit.ParserCallback {
-        StringBuffer s;
-
-        public Html2Text() {
-        }
-
-        public void parse(Reader in) throws IOException {
-            s = new StringBuffer();
-            ParserDelegator delegator = new ParserDelegator();
-            // the third parameter is TRUE to ignore charset directive
-            delegator.parse(in, this, Boolean.TRUE);
-        }
-
-        public void handleText(char[] text, int pos) {
-            s.append(text);
-        }
-
-        public String getText() {
-            return s.toString();
-        }
-    }
-
 
     public void sendNewTaskResponse(Task task, TaskMessage taskMessage, ImapMessageDto imapMsg) {
         sendResponseEmail(task, taskMessage, imapMsg, NEW_TASK_TEMPLATE);
@@ -67,24 +44,13 @@ public class ResponseEmailAsyncSenderBean {
         sendResponseEmail(task, taskMessage, null, REPLY_TASK_TEMPLATE);
     }
 
-    protected String htmlToText(String htmlText) {
-        Html2Text parser = new Html2Text();
-        try (StringReader reader = new StringReader(htmlText)) {
-            parser.parse(reader);
-            return parser.getText();
-        } catch (IOException e) {
-            log.error("Error converting html to text: " + e.getMessage());
-        }
-
-        return htmlText;
-    }
-
     protected void sendResponseEmail(Task task, TaskMessage taskMessage, @Nullable ImapMessageDto imapMessageDto, String templateName) {
-        String messageContent = htmlToText(taskMessage.getContent());
+        String messageContent = htmlToTextConverterService.convert(taskMessage.getContent());
         Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", messageContent);
+        String emailSubject = String.format("#%d %s", task.getNumber(), task.getSubject());
         EmailInfo emailInfo = new EmailInfo(
                 task.getReporterEmail(),
-                String.format("#%d %s", task.getNumber(), task.getSubject()),
+                emailSubject,
                 null,
                 templateName,
                 parameters);
@@ -98,6 +64,7 @@ public class ResponseEmailAsyncSenderBean {
             }
         }
 
+        log.info("Sending an email over SMTP with subject: " + emailSubject);
         emailerAPI.sendEmailAsync(emailInfo);
     }
 }

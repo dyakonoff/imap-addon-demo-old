@@ -33,23 +33,23 @@ public class TaskEdit extends StandardEditor<Task> {
     @Inject
     private TextField<User> assignedTo;
 
-    @Subscribe("messagesTable.edit")
-    private void onMessagesTableEdit(Action.ActionPerformedEvent event) {
-        screenBuilders.editor(messagesTable)
-                .newEntity()
-                .withScreenId(metadata.getClass(TaskMessage.class).getName() + ".create")
-                .withLaunchMode(OpenMode.DIALOG)
-                .build()
-                .show()
-                .addAfterCloseListener(e ->
-                        getEditedEntityLoader().load()
-                );
-    }
+//    @Subscribe("messagesTable.edit")
+//    private void onMessagesTableEdit(Action.ActionPerformedEvent event) {
+//        screenBuilders.editor(messagesTable)
+//                .newEntity()
+//                .withScreenId(metadata.getClass(TaskMessage.class).getName() + ".edit")
+//                .withLaunchMode(OpenMode.DIALOG)
+//                .build()
+//                .show()
+//                .addAfterCloseListener(e ->
+//                        getEditedEntityLoader().load()
+//                );
+//    }
 
     @Subscribe(target = Target.DATA_CONTEXT)
     private void onPreCommit(DataContext.PreCommitEvent event) {
         if (taskDc.getItem().getNumber() == null) {
-            // set it to 0, to get it finally assigned in the LIstener
+            // set it to 0, to get it finally assigned in the Listener
             taskDc.getItem().setNumber(0L);
         }
     }

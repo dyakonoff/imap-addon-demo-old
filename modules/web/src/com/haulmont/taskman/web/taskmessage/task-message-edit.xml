@@ -6,19 +6,20 @@
             <loader/>
         </instance>
     </data>
-    <dialogMode height="600" width="800"/>
-    <layout expand="editActions" spacing="true">
-        <form id="form" dataContainer="taskMessageDc">
-            <column width="250px">
-                <textField id="reporterField" property="reporter"/>
+    <dialogMode height="400" width="800" forceDialog="true"/>
+    <layout spacing="true" height="100%" width="100%" expand="spacer1">
+        <form id="form" dataContainer="taskMessageDc" width="100%">
+            <column width="100%">
+                <textField id="reporterField" property="reporter" editable="false"/>
                 <lookupField id="directionField" property="direction"/>
                 <textField id="subjectField" property="subject"/>
                 <textArea id="contentField" property="content"/>
             </column>
         </form>
-        <hbox id="editActions" spacing="true">
-            <button action="windowCommitAndClose"/>
-            <button action="windowClose"/>
+        <label value="" id="spacer1"/>
+        <hbox id="editActions" spacing="true" width="AUTO">
+            <button action="windowCommitAndClose" align="MIDDLE_LEFT"/>
+            <button action="windowClose" align="MIDDLE_LEFT"/>
         </hbox>
     </layout>
 </window>

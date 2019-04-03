@@ -7,5 +7,13 @@
     <context:component-scan base-package="com.haulmont.taskman"/>
     
     <gui:screens base-packages="com.haulmont.taskman.web"/>
+    <bean class="com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator">
+        <property name="remoteServices">
+            <map>
+                <entry key="taskman_HtmlToTextConverterService"
+                       value="com.haulmont.taskman.core.HtmlToTextConverterService"/>
+            </map>
+        </property>
+    </bean>
 
 </beans>
