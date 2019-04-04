@@ -40,19 +40,19 @@ public class ResponseEmailAsyncSenderBean {
         sendResponseEmail(task, taskMessage, null, REPLY_TASK_TEMPLATE);
     }
 
-    protected void sendResponseEmail(Task task, TaskMessage taskMessage, @Nullable ImapMessageDto imapMessageDto, String templateName) {
-        Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", taskMessage.getContent());
+    protected void sendResponseEmail(Task task, TaskMessage message, @Nullable ImapMessageDto imapMessage, String template) {
+        Map<String, Serializable> parameters = ImmutableMap.of("task", task, "message_content", message.getContent());
         EmailInfo emailInfo = new EmailInfo(
                 task.getReporterEmail(),
                 task.getSubject(),
                 null,
-                templateName,
+                template,
                 parameters);
 
         emailInfo.setBodyContentType("text/plain; charset=UTF-8");
 
-        if (imapMessageDto != null) {
-            String cc = imapMessageDto.getCc();
+        if (imapMessage != null) {
+            String cc = imapMessage.getCc();
             if (!"[]".equals(cc)) {
                 emailInfo.setCc(cc);
             }
