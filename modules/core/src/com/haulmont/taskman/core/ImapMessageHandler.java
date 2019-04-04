@@ -7,6 +7,7 @@ import com.haulmont.addon.imap.entity.ImapMessage;
 import com.haulmont.addon.imap.events.NewEmailImapEvent;
 import com.haulmont.cuba.core.app.UniqueNumbersAPI;
 import com.haulmont.cuba.core.global.DataManager;
+import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.taskman.entity.MessageDirection;
@@ -138,13 +139,11 @@ public class ImapMessageHandler {
     }
 
     private boolean isTaskMessageExistsForImapMessage(ImapMessage imapMessage) {
-        TaskMessage taskMessage = dataManager.load(TaskMessage.class)
-                .view(View.MINIMAL)
-                .query("select tm from taskman_TaskMessage tm where tm.originalImapMessageId = :imapMessaeId")
-                .parameter("imapMessaeId", imapMessage.getMessageId())
-                .optional()
-                .orElse(null);
-
-        return taskMessage != null;
+        LoadContext<TaskMessage> loadContext = LoadContext.create(TaskMessage.class)
+                .setQuery(
+                    LoadContext.createQuery("select tm from taskman_TaskMessage tm where tm.originalImapMessageId = :imapMessaeId")
+                        .setParameter("imapMessaeId", imapMessage.getMessageId()))
+                .setView(View.MINIMAL);
+        return dataManager.getCount(loadContext) > 0;
     }
 }
