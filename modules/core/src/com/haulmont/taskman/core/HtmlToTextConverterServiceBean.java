@@ -13,7 +13,7 @@ import java.io.StringReader;
 @Service(HtmlToTextConverterService.NAME)
 public class HtmlToTextConverterServiceBean implements HtmlToTextConverterService {
 
-    private static final Logger log = LoggerFactory.getLogger(ResponseEmailAsyncSenderBean.class);
+    private static final Logger log = LoggerFactory.getLogger(HtmlToTextConverterServiceBean.class);
 
     @Override
     public String convert(String htmlText) {
