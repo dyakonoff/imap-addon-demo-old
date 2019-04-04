@@ -15,6 +15,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class Task extends StandardEntity {
     @Column(name = "NUMBER_", nullable = false, unique = true)
     protected Long number;
 
+    @Email(message = "Email address has invalid format: ${validatedValue}",
+            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @Column(name = "REPORTER_EMAIL")
     protected String reporterEmail;
 
